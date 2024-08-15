@@ -1,0 +1,111 @@
+:root {
+    --color-1: #522258;
+    --color-2: #8C3061;
+    --color-3: #C63C51;
+    --color-4: #D95F59;
+}
+
+* {
+    margin: 0 0;
+    padding: 0 0;
+    color: #fff;
+    font-size: 1em;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+body {
+    padding-top: 3em;
+    background-color: var(--color-1);
+
+    &>* {
+        margin: 0 auto;
+        width: 90vw;
+        max-width: 350px;
+    }
+
+    &>div {
+        margin-top: 1em;
+        padding: 2em;
+        background-color: var(--color-2);
+        border-radius: 1em;
+    }
+}
+
+h1 {
+    font-size: 1.5em;
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.2em;
+    text-align: center;
+}
+
+form {
+    padding-top: 1em;
+
+    &>* {
+        display: block;
+
+        &:not(:last-child) {
+            margin-bottom: 0.5em;
+        }
+    }
+
+    & table {
+        width: 80%;
+        margin: 0 auto;
+
+        & td:first-child {
+            padding-right: 1em;
+        }
+    }
+
+    & label {
+        display: block;
+        font-size: 0.9em;
+    }
+
+    & input {
+        height: 2.2em;
+        padding: 0 0.5em;
+        color: #000;
+        border: none;
+        border-radius: 0.5em;
+        outline: none;
+
+        &#date {
+            width: 8em;
+        }
+
+        &#hours {
+            width: 3em;
+            text-align: center;
+        }
+
+        &:active,
+        &:focus,
+        &:focus-visible,
+        &:focus-within {
+            border: none;
+            outline: none;
+        }
+
+        &::placeholder {
+            color: #000;
+        }
+    }
+
+    & #result {
+        padding-top: 0.5em;
+        text-align: center;
+    }
+}
+
+button {
+    margin: 1em auto 0 auto;
+    padding: 0.5em 1em;
+    background-color: var(--color-3);
+    border: none;
+    border-radius: 0.5em;
+}
