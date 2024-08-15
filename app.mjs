@@ -6,42 +6,38 @@ import Database from 'better-sqlite3';
 const db = new Database('data.db');
 db.pragma('journal_mode = WAL');
 
-const pathIndex = './public/index.html';
-const pathFavicon = './public/favicon.ico';
-
-const contentTypeHtml = { 'Content-Type': 'text/html' };
-const contentTypeIcon = { 'Content-Type': 'image/x-icon' };
-
 createServer((req, res) => {
+	const mimeHtml = { 'Content-Type': 'text/html' };
+	const mimeCss = { 'Content-Type': 'text/css' };
+	const mimeIcon = { 'Content-Type': 'image/x-icon' };
+
 	const GET = req.method === 'GET';
 	const POST = req.method === 'POST';
 
-	if (GET && (req.url === '/' || req.url === '/index.html')) {
-		readFile(pathIndex, (_, content) => {
-			res.writeHead(200, contentTypeHtml);
+	if (GET && req.url === '/') {
+		readFile('./public/index.html', (_, content) => {
+			res.writeHead(200, mimeHtml);
 			res.end(content, 'utf-8');
 		});
 	}
 
+	if (GET && req.url === '/style.css') {
+		readFile('./public/style.css', (_, content) => {
+			res.writeHead(200, mimeCss);
+			res.end(content);
+		});
+	}
+
 	if (GET && req.url === '/favicon.ico') {
-		readFile(pathFavicon, (_, content) => {
-			res.writeHead(200, contentTypeIcon);
+		readFile('./public/favicon.ico', (_, content) => {
+			res.writeHead(200, mimeIcon);
 			res.end(content);
 		});
 	}
 
 	if (GET && req.url === '/timesheets') {
-		const data = db
-			.prepare('SELECT * FROM timesheets ORDER BY date DESC')
-			.all();
-
-		let html = '<table><tr><th>ID</th><th>Date</th><th>Hours</th></tr>';
-		for (let i = 0; i < data.length; i++) {
-			html += `<tr><td>${data[i].id}</td><td>${data[i].date}</td><td>${data[i].hours}</td></tr>`;
-		}
-		html += '</table>';
-
-		res.writeHead(200, contentTypeHtml);
+		const html = getTimesheetsHtml();
+		res.writeHead(200, mimeHtml);
 		res.end(html, 'utf-8');
 	}
 
@@ -49,14 +45,8 @@ createServer((req, res) => {
 		let body = '';
 		req.on('data', (chunk) => (body += chunk.toString()));
 		req.on('end', () => {
-			const parts = body.split('&');
-			const date = parts[0].split('=')[1];
-			const hours = parts[1].split('=')[1];
-
-			const insertData = db.prepare('INSERT INTO timesheets (date, hours) VALUES (?, ?)');
-			insertData.run(date, hours);
-
-			res.writeHead(201, contentTypeHtml);
+			insertTimesheet(body);
+			res.writeHead(201, mimeHtml);
 			res.end('<span>Created</span>', 'utf-8');
 		});
 	}
@@ -77,9 +67,6 @@ const initDb = () => {
 		)
 	`;
 	db.exec(createTable);
-
-	// const insertData = db.prepare('INSERT INTO timesheets (date, hours) VALUES (?, ?)');
-	// insertData.run('2024-08-14', 6);
 };
 
 const padRt = (str, length) => {
@@ -91,6 +78,39 @@ const padRt = (str, length) => {
 	const padding = char.repeat(padLen);
 	return str + padding;
 }
+
+const getTimesheetsHtml = () => {
+	const data = db
+		.prepare('SELECT * FROM timesheets ORDER BY date DESC')
+		.all();
+
+	let html = `
+		<table>
+			<tr>
+				<th>ID</th>
+				<th>Date</th>
+				<th>Hours</th>
+			</tr>`;
+	for (let i = 0; i < data.length; i++) {
+		html += `
+			<tr>
+				<td>${data[i].id}</td>
+				<td>${data[i].date}</td>
+				<td>${data[i].hours}</td>
+			</tr>`;
+	}
+	html += '</table>';
+	return html;
+};
+
+const insertTimesheet = (body) => {
+	const parts = body.split('&');
+	const date = parts[0].split('=')[1];
+	const hours = parts[1].split('=')[1];
+
+	const insert = db.prepare('INSERT INTO timesheets (date, hours) VALUES (?, ?)');
+	insert.run(date, hours);
+};
 
 initDb();
 console.log('Server running at http://127.0.0.1:8080/');
