@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Timesheet App</title>
+	<link rel="icon" href="/favicon.ico" type="image/x-icon" />
+	<script src="https://unpkg.com/htmx.org@2.0.1"></script>
+	<style>
+		:root {
+			--color-1: #522258;
+			--color-2: #8C3061;
+			--color-3: #C63C51;
+			--color-4: #D95F59;
+		}
+
+		* {
+			margin: 0 0;
+			padding: 0 0;
+			color: #fff;
+			font-size: 1em;
+			font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+		}
+
+		body {
+			padding-top: 3em;
+			background-color: var(--color-1);
+
+			&>* {
+				margin: 0 auto;
+				width: 90vw;
+				max-width: 350px;
+			}
+
+			&>div {
+				margin-top: 1em;
+				padding: 2em;
+				background-color: var(--color-2);
+				border-radius: 1em;
+			}
+		}
+
+		h1 {
+			font-size: 1.5em;
+			text-align: center;
+		}
+
+		h2 {
+			font-size: 1.2em;
+			text-align: center;
+		}
+
+		form {
+			padding-top: 1em;
+
+			&>* {
+				display: block;
+
+				&:not(:last-child) {
+					margin-bottom: 0.5em;
+				}
+			}
+
+			& table {
+				width: 80%;
+				margin: 0 auto;
+
+				& td:first-child {
+					margin-left: 1em;
+				}
+			}
+
+			& input {
+				width: 8em;
+				height: 1.5em;
+				color: #000;
+
+				&::placeholder {
+					color: #000;
+				}
+			}
+		}
+
+		button {
+			margin: 1em auto 0 auto;
+			padding: 0.5em 1em;
+			background-color: var(--color-3);
+			border: none;
+			border-radius: 0.5em;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Timesheet App</h1>
+	<div>
+		<h2>Add new row</h2>
+		<form hx-post="/timesheets" hx-trigger="submit" hx-target="#result" hx-swap="innerHTML">
+			<table>
+				<tr>
+					<td><label for="date">Date</label></td>
+					<td><label for="hours">Hours</label></td>
+				</tr>
+				<tr>
+					<td><input type="date" id="date" name="date" required /></td>
+					<td><input type="number" id="hours" name="hours" required /></td>
+				</tr>
+			</table>
+			<button type="submit">Add</button>
+		</form>
+		<div id="result"></div>
+	</div>
+	<div>
+		<h2>Timesheets</h2>
+		<button hx-get="/timesheets" hx-trigger="click" hx-target="#data" hx-swap="innerHTML">Load data</button>
+		<div id="data"></div>
+	</div>
+</body>
+
+</html>
