@@ -10,6 +10,7 @@ createServer((req, res) => {
 	const mimeHtml = { 'Content-Type': 'text/html' };
 	const mimeCss = { 'Content-Type': 'text/css' };
 	const mimeIcon = { 'Content-Type': 'image/x-icon' };
+	const mimeText = { 'Content-Type': 'text/plain' };
 
 	const GET = req.method === 'GET';
 	const POST = req.method === 'POST';
@@ -19,6 +20,8 @@ createServer((req, res) => {
 			res.writeHead(200, mimeHtml);
 			res.end(content, 'utf-8');
 		});
+		logRequest(req, res);
+		return;
 	}
 
 	if (GET && req.url === '/style.css') {
@@ -26,6 +29,8 @@ createServer((req, res) => {
 			res.writeHead(200, mimeCss);
 			res.end(content);
 		});
+		logRequest(req, res);
+		return;
 	}
 
 	if (GET && req.url === '/favicon.ico') {
@@ -33,12 +38,16 @@ createServer((req, res) => {
 			res.writeHead(200, mimeIcon);
 			res.end(content);
 		});
+		logRequest(req, res);
+		return;
 	}
 
 	if (GET && req.url === '/timesheets') {
 		const html = getTimesheetsHtml();
 		res.writeHead(200, mimeHtml);
 		res.end(html, 'utf-8');
+		logRequest(req, res);
+		return;
 	}
 
 	if (POST && req.url === '/timesheets') {
@@ -49,8 +58,12 @@ createServer((req, res) => {
 			res.writeHead(201, mimeHtml);
 			res.end('<span>Created</span>', 'utf-8');
 		});
+		logRequest(req, res);
+		return;
 	}
 
+	res.writeHead(404, mimeText);
+	res.end('404 Not Found', 'utf-8');
 	logRequest(req, res);
 }).listen(8080);
 
@@ -77,7 +90,7 @@ const padRt = (str, length) => {
 	}
 	const padding = char.repeat(padLen);
 	return str + padding;
-}
+};
 
 const getTimesheetsHtml = () => {
 	const data = db
